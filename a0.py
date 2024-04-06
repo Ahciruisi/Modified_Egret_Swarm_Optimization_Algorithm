@@ -55,7 +55,8 @@ y_hist_best = np.ones(size_pop)*np.inf
 
 x_global_best = x[0].copy()
 g_global_best = np.zeros(n_dim)
-y_global_best = func(x[0])
+print(x.shape, x[0].shape)
+y_global_best = func(x[0].reshape(1, n_dim))
 
 w_hist = []
 
@@ -258,7 +259,7 @@ class ESO:
         # group best location, gradient direction, and fitness 
         self.x_global_best = self.x[0].copy()
         self.g_global_best = np.zeros(self.n_dim)
-        self.y_global_best = func(self.x[0])
+        self.y_global_best = func(self.x[0].reshape(1, self.n_dim))
         
         self.hop = self.ub - self.lb
         
@@ -430,17 +431,3 @@ eso = ESO(f4, 30, 50, 500, -100, 100)
 eso.run()
 
 sb.lineplot(data=eso.y_hist)
-
-
-
-
-
-
-
-
-
-
-
-
-
-

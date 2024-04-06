@@ -12,7 +12,8 @@ import seaborn as sb
 import pandas as pd
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 from matplotlib.patches import ConnectionPatch
-from cec2017.functions import *
+from cec2017og.functions import *
+from opfunu.cec_based.cec2017 import *
 
 from ESO import ESO
 
@@ -26,37 +27,38 @@ for i in range(21, 29):
         print(i,j)
         func     = eval('f{}'.format(i))
         n_dim = 30
+        # func = F212017(n_dim, f_bias=0)
         size_pop = 50
-        max_iter = 500
+        max_iter = 1000
         lb   = np.array([-100]*n_dim)
         ub   = np.array([100]*n_dim)
         
         
         
         
-        de = DE(func=func, n_dim=n_dim, size_pop=size_pop, max_iter=max_iter, lb=lb, ub=ub)
-        de.run()
-        print('de: ', de.generation_best_Y[-1])
+        # de = DE(func=func, n_dim=n_dim, size_pop=size_pop, max_iter=max_iter, lb=lb, ub=ub)
+        # de.run()
+        # print('de: ', de.generation_best_Y[-1])
         
         
-        ga = GA(func=func, n_dim=n_dim, size_pop=size_pop, max_iter=max_iter, prob_mut=0.001, lb=lb, ub=ub, precision=1e-7)
-        ga.run()
-        print('ga: ', ga.generation_best_Y[-1])
+        # ga = GA(func=func, n_dim=n_dim, size_pop=size_pop, max_iter=max_iter, prob_mut=0.001, lb=lb, ub=ub, precision=1e-7)
+        # ga.run()
+        # print('ga: ', ga.generation_best_Y[-1])
         
         
-        pso = PSO(func=func, n_dim=n_dim, pop=size_pop, max_iter=max_iter, lb=lb, ub=ub, w=0.8, c1=0.5, c2=0.5)
-        pso.run()
-        print('pso: ', pso.gbest_y_hist[-1])
+        # pso = PSO(func=func, n_dim=n_dim, pop=size_pop, max_iter=max_iter, lb=lb, ub=ub, w=0.8, c1=0.5, c2=0.5)
+        # pso.run()
+        # print('pso: ', pso.gbest_y_hist[-1])
         
-        eso = ESO(func = func, n_dim=n_dim, size_pop=size_pop, max_iter=max_iter, lb=lb, ub=ub)
+        eso = ESO(func, n_dim, size_pop, max_iter, lb, ub)
         eso.run()
-        print('eso: ', eso.y_hist[-1])
+        print('eso: ', eso.y_history[-1])
         
-        data['eso_F{}_{}'.format(i, j)]  = eso.y_hist
+        data['eso_F{}_{}'.format(i, j)]  = eso.y_history
         
-        data['de_F{}_{}'.format(i, j)]  = de.generation_best_Y
-        data['ga_F{}_{}'.format(i, j)]  = ga.generation_best_Y
-        data['pso_F{}_{}'.format(i, j)] = pso.gbest_y_hist
+        # data['de_F{}_{}'.format(i, j)]  = de.generation_best_Y
+        # data['ga_F{}_{}'.format(i, j)]  = ga.generation_best_Y
+        # data['pso_F{}_{}'.format(i, j)] = pso.gbest_y_hist
 
 
 # In[]
@@ -80,10 +82,10 @@ for i in range(1, 8):
         
         
         
-        eso = ESO(func = func, n_dim=n_dim, size_pop=size_pop, max_iter=max_iter, lb=lb, ub=ub)
+        eso = ESO(func, n_dim, size_pop, max_iter, lb, ub)
         eso.run()
         
-        data['eso_F{}_{}'.format(i, j)]  = eso.y_hist
+        data['eso_F{}_{}'.format(i, j)]  = eso.y_history
 
 # In[]
 
