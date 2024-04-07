@@ -1,3 +1,4 @@
+# In[]
 # -*- coding: utf-8 -*-
 """
 Created on Sat Jul 23 14:31:58 2022
@@ -84,6 +85,7 @@ axins = inset_axes(ax, width="35%", height="35%", loc='center left',
                    bbox_to_anchor=(0.3, 0.1, 1, 1), 
                    bbox_transform=ax.transAxes)
 
+# axins.plot(np.arange(500), modified, color='#942e49', alpha=0.8, label='ESOA', linestyle='--')
 axins.plot(np.arange(500), eso, color='#F75000', alpha=0.8, label='ESOA', linestyle='--')
 axins.plot(np.arange(500), gwo, color='#8600FF', alpha=0.8, label='GWO',  linestyle='--')
 axins.plot(np.arange(500), hho, color='#2894FF', alpha=0.8, label='HHO',  linestyle='--')
@@ -128,6 +130,7 @@ axins.add_artist(con)
 
 metaData = pd.read_csv('result/convergence/meta_cec17_all.csv')
 traData = pd.read_csv('result/convergence/traditional_cec17.csv')
+newData = pd.read_csv('result/modifications/cec17_fitness_modified_test.csv')
 
 # In[]
 f_i = 26 
@@ -155,17 +158,20 @@ de = np.zeros(500)
 ga = np.zeros(500)
 pso = np.zeros(500)
 eso = np.zeros(500)
+modified = np.zeros(500)
 
 for j in range(5):
     de = de + traData['de_F{}_{}'.format(f_i+1,j)].values
     ga = ga + traData['ga_F{}_{}'.format(f_i+1,j)].values
     pso = pso + traData['pso_F{}_{}'.format(f_i+1,j)].values
     eso = eso + traData['eso_F{}_{}'.format(f_i+1,j)].values
+    modified = modified + newData['modified_f{}_{}'.format(f_i+1,j)].values
 
 de/=5
 ga/=5
 pso/=5
 eso/=5
+modified/=5
 
 
 
@@ -175,7 +181,8 @@ comparisons = pd.DataFrame({
         'PSO':pso,
         'GA':ga,
         'DE':de,
-        'ESOA': eso
+        'ESOA': eso,
+        'MESOA': modified
         
     })
 fig = plt.figure(figsize=(12,9))
@@ -183,6 +190,7 @@ fig = plt.figure(figsize=(12,9))
 sb.set_theme(style="ticks")
 ax = fig.gca()
 
+ax.plot(np.arange(500), modified, color='#942e49', alpha=0.8, label='MESOA', linestyle='--')
 ax.plot(np.arange(500), eso, color='#F75000', alpha=0.8, label='ESOA', linestyle='--')
 ax.plot(np.arange(500), gwo, color='#8600FF', alpha=0.8, label='GWO',  linestyle='--')
 ax.plot(np.arange(500), hho, color='#2894FF', alpha=0.8, label='HHO',  linestyle='--')
@@ -199,6 +207,7 @@ axins = inset_axes(ax, width="35%", height="35%", loc='center left',
                    bbox_to_anchor=(0.3, 0.1, 1, 1), 
                    bbox_transform=ax.transAxes)
 
+axins.plot(np.arange(500), modified, color='#942e49', alpha=0.8, label='MESOA', linestyle='--')
 axins.plot(np.arange(500), eso, color='#F75000', alpha=0.8, label='ESOA', linestyle='--')
 axins.plot(np.arange(500), gwo, color='#8600FF', alpha=0.8, label='GWO',  linestyle='--')
 axins.plot(np.arange(500), hho, color='#2894FF', alpha=0.8, label='HHO',  linestyle='--')
@@ -247,3 +256,5 @@ axins.add_artist(con)
 
 
 
+
+# %%

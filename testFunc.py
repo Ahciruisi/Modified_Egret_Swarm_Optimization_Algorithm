@@ -23,7 +23,7 @@ def Ufun(x, a, k, m):
 
 
 def F1(x):
-    s = np.sum(x ** 2)
+    s = np.sum(x ** 2) - 4
     return s
 
 

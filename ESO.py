@@ -36,7 +36,7 @@ class ESO:
         self.x = np.random.uniform(0, 1, size=self.matrix_dim) * (self.ub-self.lb) + self.lb
         print("x shape = ", self.x.shape)
         self.y = np.empty(self.population_size)
-        self.p_y = self.y.copy()
+        self.y_hat = self.y.copy()
         
         # best fitness history and estimate error history
         self.y_history = []
@@ -114,9 +114,9 @@ class ESO:
     
     def updateSurface(self):
         self.y = self.callFunc(self.x).reshape(self.population_size)
-        self.p_y = np.sum(self.w*self.x, axis=1)
-        self.error_history.append(np.abs(self.y-self.p_y).min())
-        p = self.p_y-self.y
+        self.y_hat = np.sum(self.w*self.x, axis=1)
+        self.error_history.append(np.abs(self.y-self.y_hat).min())
+        p = self.y_hat-self.y
         p = self.refill(p)
         g_temp = p*self.x
         
