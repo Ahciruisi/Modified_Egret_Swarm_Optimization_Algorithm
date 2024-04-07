@@ -163,26 +163,28 @@ class ESOModified:
         u = np.random.normal(0, sigma_u**2, size=self.matrix_dim)
         v = np.random.normal(0, sigma_v**2, size=self.matrix_dim)
         s = u/(np.abs(v)**(1/beta))
-        x_m = s * (self.ub - self.lb) / self.lb + self.lb
-        x_m = self.checkBound(x_m)
-
+        x = s * (self.ub - self.lb) / self.lb + self.lb
         
-        y_m = self.callFunc(x_m)
-
-        return x_m, y_m
+        return x
 
 
     def randomSearch(self):
         # # Random search
-        # r = np.random.uniform(-np.pi / 2, np.pi / 2, size=self.matrix_dim)
-        # decay = 1 / math.sqrt(1 + self.current_iter)
-        # x_n = self.x + np.tan(r) * self.hop/( 1 + self.current_iter) * 0.5
+        r = np.random.uniform(-np.pi / 2, np.pi / 2, size=self.matrix_dim)
+        decay = 1 / math.sqrt(1 + self.current_iter)
+        x_n = self.x + np.tan(r) * self.hop/( 1 + self.current_iter) * 0.5
         
-        # x_n = self.checkBound(x_n)
-        # y_n = self.callFunc(x_n)
+        x_n = self.checkBound(x_n)
+        y_n = self.callFunc(x_n)
         
         # Levy search
-        x_n, y_n = self.levySearch()
+        proposed_x = self.levySearch()
+        delta = (proposed_x - self.x)
+        decay = 1 / (1 + self.current_iter)
+        x_l = self.x + delta * self.hop * decay
+
+        x_l = self.checkBound(x_l)
+        y_l = self.callFunc(x_l)
 
         # Random step search
         d = self.x_hist_best - self.x
@@ -196,7 +198,7 @@ class ESOModified:
         
         y_m = self.callFunc(x_m)
 
-        return x_m, y_m, x_n, y_n
+        return x_l, y_l, x_m, y_m, x_n, y_n
 
 
     def adviceSearch(self):
@@ -212,14 +214,14 @@ class ESOModified:
         for self.current_iter in range(self.max_iter):
             # print("iteration:", self.current_iter)
             self.updateSurface()
-            x_m, y_m, x_n, y_n = self.randomSearch()
+            x_l, y_l, x_m, y_m, x_n, y_n = self.randomSearch()
             x_o, y_o = self.adviceSearch()
             
             # Comparison
             x_i = np.empty_like(self.x)
             y_i = np.empty_like(self.y)
-            x_summary = np.array([x_m, x_n, x_o])
-            y_summary = np.column_stack((y_m, y_n, y_o))
+            x_summary = np.array([x_l, x_m, x_n, x_o])
+            y_summary = np.column_stack((y_l, y_m, y_n, y_o))
             y_summary[y_summary == np.nan] = np.inf
             i_ind = y_summary.argmin(axis=1)
             for i in range(self.population_size):

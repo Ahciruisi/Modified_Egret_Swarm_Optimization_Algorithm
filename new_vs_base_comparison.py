@@ -24,7 +24,7 @@ from ESOmodified import ESOModified
 eso_data ={}
 eso_modified_data ={}
 for i in range(1, 31):
-    for j in range(5):
+    for j in range(10):
         print(f"Function {i}, run {j}:")
         func     = eval('f{}'.format(i))
         n_dim = 30
