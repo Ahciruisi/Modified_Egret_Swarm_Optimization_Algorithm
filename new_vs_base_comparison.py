@@ -1,30 +1,22 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Jul  7 19:59:17 2022
-
-@author: 山抹微云
-"""
-
 from testFunc import *
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sb
 import pandas as pd
-from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-from matplotlib.patches import ConnectionPatch
 from cec2017.functions import *
 import math
 import numpy as np
 from collections import defaultdict
 
-from ESOnew import ESO
-from ESOmodified import ESOModified
+from ESOVectorised import ESO
+from ESOModifiedVectorised import ESOModified
 
 # In[]
+no_of_runs = 50
+
 eso_data ={}
 eso_modified_data ={}
 for i in range(1, 31):
-    for j in range(10):
+    for j in range(no_of_runs):
         print(f"Function {i}, run {j}:")
         func     = eval('f{}'.format(i))
         n_dim = 30
@@ -74,11 +66,11 @@ eso_modified_fitness_avg = {}
 eso_fitness_stddev = {}
 eso_modified_fitness_stddev = {}
 for i in range(1, 31):
-    eso_fitnesses = np.array([eso_fitness[f"eso_f{i}_{j}"] for j in range(5)], dtype=float)
+    eso_fitnesses = np.array([eso_fitness[f"eso_f{i}_{j}"] for j in range(no_of_runs)], dtype=float)
     eso_fitness_avg[f"f{i}"] = eso_fitnesses.mean()
     eso_fitness_stddev[f"f{i}"] = eso_fitnesses.std()
 
-    eso_modified_fitnesses = np.array([eso_modified_fitness[f"modified_f{i}_{j}"] for j in range(5)], dtype=float)
+    eso_modified_fitnesses = np.array([eso_modified_fitness[f"modified_f{i}_{j}"] for j in range(no_of_runs)], dtype=float)
     eso_modified_fitness_avg[f"f{i}"] = eso_modified_fitnesses.mean()
     eso_modified_fitness_stddev[f"f{i}"] = eso_modified_fitnesses.std()
 
@@ -106,30 +98,7 @@ print(count_better_means)
 print("Better standard deviations count:")
 print(count_better_stddevs)
 
-# print("ESO:")
-# print("Average:")
-# print()
-
-# eso_data ={}
-# eso_modified_data ={}
-# for i in range(1, 31):
-#     for j in range(5):
-#         print(f"Function {i}, run {j}:")
-#         func     = eval('f{}'.format(i))
-#         n_dim = 30
-#         population_size = 50
-#         max_iter = 500
-#         lb   = np.array([-100]*n_dim)
-#         ub   = np.array([100]*n_dim)
-        
-#         eso_modified = ESOModified(func, n_dim, population_size, max_iter, lb, ub)
-#         eso_modified.run()
-#         print('modified: ', eso_modified.y_history[-1])
-        
-#         eso_modified_data['modified_f{}_{}'.format(i, j)]  = eso_modified.y_history
-
-
-# # In[]
-
-# eso_modified_data = pd.DataFrame(eso_modified_data)
-# eso_modified_data.to_csv('result/modifications/cec17_fitness_modified_test.csv')
+# Better means count:
+# defaultdict(<class 'int'>, {'modified': 17, 'eso': 13})
+# Better standard deviations count:
+# defaultdict(<class 'int'>, {'modified': 13, 'eso': 17})

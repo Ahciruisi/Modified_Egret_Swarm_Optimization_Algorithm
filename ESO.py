@@ -34,7 +34,6 @@ class ESO:
         # location, fitness, and estimate fitness
         # Initialise x to random values between lb to ub (-100 to 100 in this case)
         self.x = np.random.uniform(0, 1, size=self.matrix_dim) * (self.ub-self.lb) + self.lb
-        print("x shape = ", self.x.shape)
         self.y = np.empty(self.population_size)
         self.y_hat = self.y.copy()
         
@@ -57,7 +56,7 @@ class ESO:
     def callFunc(self, x):
         return np.array([self.func(x[i, :]) for i in range(self.population_size)])
     
-    def checkBound(self,x):
+    def clipToMeetBounds(self,x):
         return np.clip(x, self.lb, self.ub)
     
     
@@ -146,49 +145,47 @@ class ESO:
     def randomSearch(self):
         # Random search
         r = np.random.uniform(-np.pi / 2, np.pi / 2, size=self.matrix_dim)
-        x_n = self.x + np.tan(r) * self.hop/( 1 + self.times) *0.5
+        x_b = self.x + np.tan(r) * self.hop/( 1 + self.times) *0.5
         
-        x_n = self.checkBound(x_n)
+        x_b = self.clipToMeetBounds(x_b)
 
         
-        y_n = self.callFunc(x_n)
+        y_b = self.callFunc(x_b)
         
         # Random step search
         d = self.x_hist_best - self.x
         d_g = self.x_global_best - self.x
-        #r = np.random.uniform(-np.pi / 2, np.pi / 2, size=(population_size, n_dim))
+
         r = np.random.uniform(0, 0.5, size=self.matrix_dim)
         r2 = np.random.uniform(0, 0.5, size=self.matrix_dim)
-        x_m = (1-r-r2) * self.x + r * d + r2 * d_g
-        x_m = self.checkBound(x_m)
+        x_c = (1-r-r2) * self.x + r * d + r2 * d_g
+        x_c = self.clipToMeetBounds(x_c)
 
-        
-        y_m = self.callFunc(x_m)
+        y_c = self.callFunc(x_c)
 
-        return x_m, y_m, x_n, y_n
+        return x_c, y_c, x_b, y_b
 
 
     def adviceSearch(self):
-        x_o = self.x + np.exp(-self.times/(0.1*self.max_iter)) * 0.1 * self.hop * self.g
-        x_o = self.checkBound(x_o)
+        x_a = self.x + np.exp(-self.times/(0.1*self.max_iter)) * 0.1 * self.hop * self.g
+        x_a = self.clipToMeetBounds(x_a)
 
-        
-        y_o = self.callFunc(x_o)
-        return x_o, y_o
+        y_a = self.callFunc(x_a)
+        return x_a, y_a
 
     
     def run(self):
         for self.times in range(self.max_iter):
 
             self.updateSurface()
-            x_m, y_m, x_n, y_n = self.randomSearch()
-            x_o, y_o = self.adviceSearch()
+            x_c, y_c, x_b, y_b = self.randomSearch()
+            x_a, y_a = self.adviceSearch()
             
             # Comparison
             x_i = np.empty_like(self.x)
             y_i = np.empty_like(self.y)
-            x_summary = np.array([x_m, x_n, x_o])
-            y_summary = np.column_stack((y_m, y_n, y_o))
+            x_summary = np.array([x_c, x_b, x_a])
+            y_summary = np.column_stack((y_c, y_b, y_a))
             y_summary[y_summary == np.nan] = np.inf
             i_ind = y_summary.argmin(axis=1)
             for i in range(self.population_size):
@@ -197,7 +194,6 @@ class ESO:
 
             
             # Update location
-            
             mask = y_i < self.y
             self.y = np.where(mask, y_i, self.y)
             
@@ -221,9 +217,6 @@ class ESO:
                 mask = ran < 0.3
                 self.x = np.where(mask, x_i, self.x)
                 self.y = np.where(mask[:, 0], y_i, self.y)
-            
-
-            
 
             self.y_history.append(self.y_global_best.copy())
 
